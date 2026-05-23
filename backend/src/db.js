@@ -1,49 +1,59 @@
-const fs = require('fs');
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
 
-const dbPath = path.join(__dirname, '..', 'prices_db.json');
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+let supabase;
 
-// Initialize DB file if not exists
-if (!fs.existsSync(dbPath)) {
-  fs.writeFileSync(dbPath, JSON.stringify([]));
-  console.log('Created local JSON database for prices.');
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+  console.log('✅ Conectado a Supabase.');
+} else {
+  console.warn("⚠️ SUPABASE_URL o SUPABASE_KEY faltan en el .env! El historial no se guardará.");
 }
 
-function insertPrice(pair, buyPrice, sellPrice) {
+async function insertPrice(pair, buyPrice, sellPrice) {
+  if (!supabase) return;
   try {
-    const raw = fs.readFileSync(dbPath, 'utf8');
-    const data = JSON.parse(raw);
-    
-    data.push({
-      timestamp: Date.now(),
-      pair,
-      buyPrice,
-      sellPrice
-    });
-    
-    // Keep only last 1000 records to prevent memory bloat
-    if (data.length > 1000) {
-      data.shift();
-    }
-    
-    fs.writeFileSync(dbPath, JSON.stringify(data));
+    const { error } = await supabase
+      .from('price_history')
+      .insert([
+        {
+          xylo_price: buyPrice,
+          syntra_price: sellPrice
+          // created_at is automatically set by Supabase
+        }
+      ]);
+    if (error) throw error;
   } catch (err) {
-    console.error('Error writing to JSON db', err.message);
+    console.error('Error writing to Supabase:', err.message);
   }
 }
 
-function getHistory(pair, limit = 100) {
-  return new Promise((resolve, reject) => {
-    try {
-      const raw = fs.readFileSync(dbPath, 'utf8');
-      const data = JSON.parse(raw);
-      const filtered = data.filter(d => d.pair === pair);
-      const sliced = filtered.slice(-limit); // get last `limit` elements
-      resolve(sliced);
-    } catch (err) {
-      reject(err);
-    }
-  });
+async function getHistory(pair, limit = 100) {
+  if (!supabase) return [];
+  try {
+    const { data, error } = await supabase
+      .from('price_history')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+      
+    if (error) throw error;
+    
+    // Map back to the expected UI format (reverse so oldest is first for the graph)
+    const formatted = data.map(row => ({
+      timestamp: new Date(row.created_at).getTime(),
+      pair: 'EURC/USDC', // Default pair since it's not in the DB
+      buyPrice: row.xylo_price,
+      sellPrice: row.syntra_price
+    })).reverse();
+    
+    return formatted;
+  } catch (err) {
+    console.error('Error fetching from Supabase:', err.message);
+    return [];
+  }
 }
 
 module.exports = {
