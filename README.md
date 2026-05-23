@@ -1,4 +1,4 @@
-<div align="center"><img src="./frontend/public/logo.PNG" width="120" alt="SpreadHunter" /></div>
+<div align="center"><img src="./frontend/public/logo.PNG" width="300" alt="SpreadHunter" /></div>
 
 <div align="center">
 

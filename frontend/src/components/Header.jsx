@@ -17,7 +17,7 @@ export default function Header({ wsStatus = 'connecting' }) {
   return (
     <header className="header panel" style={{ padding: '1rem 1.5rem', marginBottom: '0' }}>
       <div className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <img src="/logo.PNG" alt="SpreadHunter Logo" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+        <img src="/logo.PNG" alt="SpreadHunter Logo" style={{ width: '200px', height: '80px', borderRadius: '6px' }} />
         {/* Animated pulse dot */}
         <span style={{ position: 'relative', display: 'inline-flex', width: '12px', height: '12px' }}>
           <span
