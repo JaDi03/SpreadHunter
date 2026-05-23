@@ -16,8 +16,8 @@ const STATUS_LABEL = {
 export default function Header({ wsStatus = 'connecting' }) {
   return (
     <header className="header panel" style={{ padding: '1rem 1.5rem', marginBottom: '0' }}>
-      <div className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <img src="/logo.png" alt="SpreadHunter Logo" style={{ width: '22px', height: '22px', borderRadius: '4px' }} />
+      <div className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <img src="/logo.PNG" alt="SpreadHunter Logo" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
         {/* Animated pulse dot */}
         <span style={{ position: 'relative', display: 'inline-flex', width: '12px', height: '12px' }}>
           <span
@@ -41,7 +41,6 @@ export default function Header({ wsStatus = 'connecting' }) {
             }}
           />
         </span>
-        SpreadHunter
       </div>
 
       {/* Network + status badge */}
