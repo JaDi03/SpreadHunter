@@ -16,6 +16,7 @@ function App() {
     successRate: 0,
     totalTxs: 0,
     agentId: null,
+    ownerAddress: null,
     usdcBalance: '0.00',
     eurcBalance: '0.00'
   });
@@ -44,8 +45,11 @@ function App() {
       .then(data => {
         setIsAgentRegistered(data.isRegistered);
         if (data.isRegistered && data.agentId) {
-          // Store agent ID in state
-          setStats(prev => ({ ...prev, agentId: data.agentId }));
+          setStats(prev => ({
+            ...prev,
+            agentId: data.agentId,
+            ownerAddress: data.ownerAddress,
+          }));
         }
       })
       .catch(err => console.error("Setup check failed", err));
@@ -239,7 +243,18 @@ function App() {
           ) : (
             <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Pending Registration...</div>
           )}
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>View Reputation & Tx History</div>
+          {stats.ownerAddress ? (
+            <a
+              href={`https://testnet.arcscan.app/address/${stats.ownerAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '0.8rem', color: 'var(--accent-green)', textDecoration: 'none', marginTop: '0.25rem', display: 'block' }}
+            >
+              View Tx History ↗
+            </a>
+          ) : (
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>View Reputation & Tx History</div>
+          )}
         </div>
       </div>
 

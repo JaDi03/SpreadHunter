@@ -213,7 +213,13 @@ app.post('/api/wallets/create', async (req, res) => {
 // Check if agent is registered
 app.get('/api/setup/status', (req, res) => {
   const isRegistered = !!config.settings.agent.id;
-  res.json({ isRegistered, agentId: config.settings.agent.id });
+  res.json({
+    isRegistered,
+    agentId: config.settings.agent.id,
+    ownerAddress: config.settings.agent.ownerAddress,
+    validatorAddress: config.settings.agent.validatorAddress,
+    identityRegistry: config.settings.agent.identityRegistry,
+  });
 });
 
 // Generate Master Wallets
