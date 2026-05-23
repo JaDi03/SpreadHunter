@@ -30,7 +30,7 @@ class AgentRegistry {
    */
   async recordSuccess(reasoningText) {
     const agentId = this._getAgentId();
-    const walletAddress = config.settings.agent.ownerAddress;
+    const walletAddress = config.settings.agent.validatorAddress;
 
     if (!walletManager.enabled || !walletAddress) {
       console.warn('[AgentRegistry] Skipping reputation log: Circle SDK not configured or walletAddress missing');
