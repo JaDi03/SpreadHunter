@@ -30,7 +30,7 @@ function App() {
 
   useEffect(() => {
     // 0. Fetch config
-    fetch('https://spreadhunter.onrender.com/api/config')
+    fetch('http://localhost:3001/api/config')
       .then(res => res.json())
       .then(data => {
         if (data.settings?.defaultAmountIn) {
@@ -39,7 +39,7 @@ function App() {
       })
       .catch(err => console.error("Config fetch failed", err));
     // 1. Check if agent is globally registered
-    fetch('https://spreadhunter.onrender.com/api/setup/status')
+    fetch('http://localhost:3001/api/setup/status')
       .then(res => res.json())
       .then(data => {
         setIsAgentRegistered(data.isRegistered);
@@ -52,7 +52,7 @@ function App() {
 
     // 2. Fetch USDC balance if we have a wallet
     if (userWallet?.address) {
-      fetch(`https://spreadhunter.onrender.com/api/wallet/${userWallet.address}/balance`)
+      fetch(`http://localhost:3001/api/wallet/${userWallet.address}/balance`)
         .then(res => res.json())
         .then(data => {
           if (data.balance) setStats(prev => ({ ...prev, usdcBalance: data.balance }));
@@ -66,7 +66,7 @@ function App() {
 
     function connect() {
       setWsStatus('connecting');
-      ws = new WebSocket('wss://spreadhunter.onrender.com');
+      ws = new WebSocket('ws://localhost:3001');
 
       ws.onopen = () => setWsStatus('live');
 
@@ -173,7 +173,7 @@ function App() {
 
   const handleUpdateTradeAmount = async (newAmount) => {
     try {
-      const res = await fetch('https://spreadhunter.onrender.com/api/config/trade-amount', {
+      const res = await fetch('http://localhost:3001/api/config/trade-amount', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: newAmount })

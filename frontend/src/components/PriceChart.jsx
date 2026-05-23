@@ -10,7 +10,7 @@ import {
   Legend,
 } from 'recharts';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://spreadhunter.onrender.com';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 function formatTime(ts) {
   const d = new Date(ts);
