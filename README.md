@@ -1,4 +1,4 @@
-# SpreadHunter
+# <img src="./frontend/public/logo.png" width="40" height="40" alt="Logo" style="vertical-align: middle; margin-right: 10px; border-radius: 6px;" /> SpreadHunter
 
 <div align="center">
 
