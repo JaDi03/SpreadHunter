@@ -89,11 +89,17 @@ function App() {
 
         if (type === 'execution_success') {
           const explorerBase = data.explorerBase || 'https://testnet.arcscan.app';
-          setStats((prev) => ({
-            ...prev,
-            totalTxs: prev.totalTxs + 1,
-            successRate: Math.round(((prev.totalTxs + 1) / (prev.opportunitiesFound || 1)) * 100),
-          }));
+          setStats((prev) => {
+            const newTxs = prev.totalTxs + 1;
+            // Usamos un aproximado basado en defaultAmountIn * spread. Lo ideal sería que el backend envíe el profit exacto en USDC.
+            const estimatedProfit = (parseFloat(tradeAmount) * (data.netSpreadPercent / 100));
+            return {
+              ...prev,
+              totalTxs: newTxs,
+              totalProfitUsdc: prev.totalProfitUsdc + estimatedProfit,
+              successRate: Math.round((newTxs / (prev.opportunitiesFound || 1)) * 100),
+            };
+          });
           setCurrentReasoning(prev =>
             `${prev || ''}\n\n✅ EXECUTED\n` +
             `  Leg 1: ${explorerBase}/tx/${data.leg1Hash}\n` +
