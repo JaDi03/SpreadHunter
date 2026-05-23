@@ -293,7 +293,7 @@ function AgentSetupWizard({ onComplete }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:3001/api/setup/generate-wallets', { method: 'POST' });
+      const res = await fetch('https://spreadhunter.onrender.com/api/setup/generate-wallets', { method: 'POST' });
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       setWallets(data.wallets);
@@ -315,7 +315,7 @@ function AgentSetupWizard({ onComplete }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:3001/api/setup/register-agent', {
+      const res = await fetch('https://spreadhunter.onrender.com/api/setup/register-agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ownerWalletAddress: wallets.ownerWallet }),

@@ -30,7 +30,7 @@ function App() {
 
   useEffect(() => {
     // 0. Fetch config
-    fetch('http://localhost:3001/api/config')
+    fetch('https://spreadhunter.onrender.com/api/config')
       .then(res => res.json())
       .then(data => {
         if (data.settings?.defaultAmountIn) {
@@ -39,7 +39,7 @@ function App() {
       })
       .catch(err => console.error("Config fetch failed", err));
     // 1. Check if agent is globally registered
-    fetch('http://localhost:3001/api/setup/status')
+    fetch('https://spreadhunter.onrender.com/api/setup/status')
       .then(res => res.json())
       .then(data => {
         setIsAgentRegistered(data.isRegistered);
@@ -52,7 +52,7 @@ function App() {
 
     // 2. Fetch USDC balance if we have a wallet
     if (userWallet?.address) {
-      fetch(`http://localhost:3001/api/wallet/${userWallet.address}/balance`)
+      fetch(`https://spreadhunter.onrender.com/api/wallet/${userWallet.address}/balance`)
         .then(res => res.json())
         .then(data => {
           if (data.balance) setStats(prev => ({ ...prev, usdcBalance: data.balance }));
@@ -66,7 +66,7 @@ function App() {
 
     function connect() {
       setWsStatus('connecting');
-      ws = new WebSocket('ws://localhost:3001');
+      ws = new WebSocket('wss://spreadhunter.onrender.com');
 
       ws.onopen = () => setWsStatus('live');
 
@@ -173,7 +173,7 @@ function App() {
 
   const handleUpdateTradeAmount = async (newAmount) => {
     try {
-      const res = await fetch('http://localhost:3001/api/config/trade-amount', {
+      const res = await fetch('https://spreadhunter.onrender.com/api/config/trade-amount', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: newAmount })
@@ -190,10 +190,10 @@ function App() {
   return (
     <div className="app-container">
       <Header wsStatus={wsStatus} />
-      
+
       {/* Portfolio Info and Agent Registry */}
       <div className="panel" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
-        
+
         {/* Wallet & Balance */}
         <div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem', fontWeight: 'bold' }}>Agent Portfolio (Arc)</div>
@@ -213,8 +213,8 @@ function App() {
         <div style={{ padding: '0.75rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem', fontWeight: 'bold' }}>Max Trade Size</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <input 
-              type="number" 
+            <input
+              type="number"
               value={tradeAmount}
               onChange={(e) => setTradeAmount(e.target.value)}
               onBlur={() => handleUpdateTradeAmount(tradeAmount)}
@@ -228,16 +228,16 @@ function App() {
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem', fontWeight: 'bold' }}>ERC-8004 Identity</div>
           {stats.agentId ? (
-            <a 
-              href={`https://testnet.arcscan.app/token/0x8004A818BFB912233c491871b3d84c89A494BD9e/instance/${stats.agentId}`} 
-              target="_blank" 
+            <a
+              href={`https://testnet.arcscan.app/token/0x8004A818BFB912233c491871b3d84c89A494BD9e/instance/${stats.agentId}`}
+              target="_blank"
               rel="noopener noreferrer"
               style={{ color: 'var(--accent-purple)', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}
             >
               #{stats.agentId} ↗
             </a>
           ) : (
-             <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Pending Registration...</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Pending Registration...</div>
           )}
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>View Reputation & Tx History</div>
         </div>
