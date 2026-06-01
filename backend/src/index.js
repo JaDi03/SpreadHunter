@@ -78,7 +78,7 @@ async function scanLoop() {
           console.log(`[Agent] ✓ Arbitrage executed! Leg1: ${leg1Hash} | Leg2: ${leg2Hash}`);
 
           // 4. Record reputation on-chain
-          await agentRegistry.recordSuccess(reasoning.text);
+          const repTxHash = await agentRegistry.recordSuccess(reasoning.text, opp);
 
           broadcaster.broadcast('execution_success', {
             pair: opp.pair,
@@ -171,9 +171,9 @@ app.post('/api/bridge', async (req, res) => {
     if (!amount) return res.status(400).json({ error: 'Missing amount' });
 
     // Use the agent wallet address as the mint recipient on Arc
-    const recipientAddress = process.env.AGENT_ADDRESS;
+    const recipientAddress = process.env.AGENT_ADDRESS || config.settings.agent.ownerAddress;
     if (!recipientAddress) {
-      return res.status(400).json({ error: 'AGENT_ADDRESS not set in .env' });
+      return res.status(400).json({ error: 'AGENT_ADDRESS not set in .env and agent owner address not configured.' });
     }
 
     const burnTxHash = await bridgeService.bridge(amount, recipientAddress);

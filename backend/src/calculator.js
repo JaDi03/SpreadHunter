@@ -56,8 +56,8 @@ class Calculator {
           // Fee estimation: We pay the fee tier on both DEXes.
           // Note: XyloNet uses feeTier=0 in our config conceptually, or it uses the feeTier loop
           // But actually XyloNet is V2 and has a fixed 0.3% (30 bps) fee. Let's use the max of feeTier or 30 for V2.
-          const actualBuyFee = buyDex === 'XyloNet' ? 30 : buyFee;
-          const actualSellFee = sellDex === 'XyloNet' ? 30 : sellFee;
+          const actualBuyFee = buyDex === 'XyloNet' ? 3000 : buyFee;
+          const actualSellFee = sellDex === 'XyloNet' ? 3000 : sellFee;
 
           const feePercent = (actualBuyFee + actualSellFee) / 10000;
           const netSpreadPercent = rawSpreadPercent - feePercent;

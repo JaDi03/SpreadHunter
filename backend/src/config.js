@@ -19,6 +19,7 @@ config.env = {
   LLM_API_KEY: process.env.LLM_API_KEY || process.env.CLAUDE_API_KEY,
   CIRCLE_API_KEY: process.env.CIRCLE_API_KEY,
   CIRCLE_ENTITY_SECRET: process.env.CIRCLE_ENTITY_SECRET,
+  AGENT_PRIVATE_KEY: process.env.AGENT_PRIVATE_KEY,
 };
 
 module.exports = config;
