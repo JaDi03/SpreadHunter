@@ -86,6 +86,7 @@ async function scanLoop() {
             leg2Hash,
             netSpreadPercent: opp.netSpreadPercent,
             reasoning: reasoning.text,
+            repTxHash,
             explorerBase: config.network.explorer
           });
         } catch (execErr) {
