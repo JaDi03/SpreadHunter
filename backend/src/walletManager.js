@@ -244,6 +244,100 @@ class WalletManager {
     if (!txHash) throw new Error("Transaction confirmation timed out");
     return txHash;
   }
+
+  /**
+   * Bridges USDC from a source chain to Arc Testnet via Circle CCTP.
+   * Uses Circle WaaS client to execute approve and depositForBurn on the source network.
+   */
+  async bridgeToArc(sourceChain, amount, walletAddress) {
+    if (!this.enabled) {
+      throw new Error("Circle SDK not configured. Missing CIRCLE_API_KEY or CIRCLE_ENTITY_SECRET.");
+    }
+
+    const { ethers } = require('ethers');
+    const mintRecipient = ethers.zeroPadValue(ethers.getBytes(walletAddress), 32);
+
+    const configMap = {
+      "ETH-SEPOLIA": {
+        usdc: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+        tokenMessenger: "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5"
+      },
+      "BASE-SEPOLIA": {
+        usdc: "0x036CbD53842c5426634e7929541eC2318f3dcf7e",
+        tokenMessenger: "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5"
+      },
+      "ARB-SEPOLIA": {
+        usdc: "0x75faf114eaf91d9c998707ef22243d173786ab02",
+        tokenMessenger: "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5"
+      }
+    };
+
+    const chain = sourceChain.toUpperCase();
+    const cctpConfig = configMap[chain];
+    if (!cctpConfig) {
+      throw new Error(`Unsupported source chain for auto-bridge: ${sourceChain}`);
+    }
+
+    const entitySecretCiphertext = await this._generateCiphertext();
+
+    // Step 1: Approve TokenMessenger to spend USDC on source chain
+    console.log(`[bridgeToArc] Approving USDC for TokenMessenger on ${chain}...`);
+    const approveTx = await this.client.createContractExecutionTransaction({
+      idempotencyKey: crypto.randomUUID(),
+      entitySecretCiphertext,
+      walletAddress,
+      blockchain: chain,
+      contractAddress: cctpConfig.usdc,
+      abiFunctionSignature: "approve(address,uint256)",
+      abiParameters: [cctpConfig.tokenMessenger, amount.toString()],
+      fee: { type: "level", config: { feeLevel: "MEDIUM" } }
+    });
+
+    // Wait for approval transaction to be COMPLETE
+    let approveConfirmed = false;
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 2000));
+      const { data } = await this.client.getTransaction({ id: approveTx.data.id });
+      if (data?.transaction?.state === "COMPLETE") {
+        approveConfirmed = true;
+        break;
+      }
+      if (data?.transaction?.state === "FAILED") {
+        throw new Error(`Approval transaction failed on source chain: ${data?.transaction?.errorCode || 'Unknown'}`);
+      }
+    }
+    if (!approveConfirmed) throw new Error("Approval transaction timed out on source chain");
+
+    // Step 2: depositForBurn on source chain
+    console.log(`[bridgeToArc] Depositing USDC for burn on ${chain}...`);
+    const burnTx = await this.client.createContractExecutionTransaction({
+      idempotencyKey: crypto.randomUUID(),
+      entitySecretCiphertext,
+      walletAddress,
+      blockchain: chain,
+      contractAddress: cctpConfig.tokenMessenger,
+      abiFunctionSignature: "depositForBurn(uint256,uint32,bytes32,address)",
+      abiParameters: [amount.toString(), "5", mintRecipient, cctpConfig.usdc],
+      fee: { type: "level", config: { feeLevel: "MEDIUM" } }
+    });
+
+    // Poll for burn completion
+    let burnTxHash = null;
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 2000));
+      const { data } = await this.client.getTransaction({ id: burnTx.data.id });
+      if (data?.transaction?.state === "COMPLETE") {
+        burnTxHash = data.transaction.txHash;
+        break;
+      }
+      if (data?.transaction?.state === "FAILED") {
+        throw new Error(`Burn transaction failed on source chain: ${data?.transaction?.errorCode || 'Unknown'}`);
+      }
+    }
+    if (!burnTxHash) throw new Error("Burn transaction timed out on source chain");
+
+    return { success: true, burnTxHash };
+  }
 }
 
 module.exports = new WalletManager();
