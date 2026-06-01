@@ -7,6 +7,6 @@
     "backend": "cd backend && node src/index.js",
     "frontend": "cd frontend && pnpm dev",
     "register": "cd backend && node scripts/registerAgent.mjs",
-    "dev": "start cmd /k \"cd backend && node src/index.js\" && start cmd /k \"cd frontend && pnpm dev\""
+    "dev": "echo Please run backend and frontend separately in two terminals."
   }
 }

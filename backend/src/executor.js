@@ -12,12 +12,12 @@ class Executor {
     const buyDex = dexRegistry.getDex(opportunity.buyDex);
     const recipient = recipientAddress || config.settings.agent.ownerAddress || ethers.ZeroAddress;
     const [tokenOutSymbol, tokenInSymbol] = opportunity.pair.split('/');
-    const tokenIn = dexRegistry.tokens[tokenInSymbol]; 
-    const tokenOut = dexRegistry.tokens[tokenOutSymbol]; 
+    const tokenIn = dexRegistry.tokens[tokenInSymbol];
+    const tokenOut = dexRegistry.tokens[tokenOutSymbol];
 
     const amountInStr = config.settings.defaultAmountIn || '1000000';
     const amountIn = ethers.parseUnits(amountInStr, tokenIn.decimals);
-    
+
     // We only need this for the frontend preview endpoint, returning dummy data if we migrate fully to backend.
     return { to: buyDex.contracts.routerAddress, data: '0x', value: '0x0', amountIn: amountIn.toString() };
   }
@@ -37,7 +37,7 @@ class Executor {
     const amountInStr = config.settings.defaultAmountIn || '1000000';
     let amountIn = ethers.parseUnits(amountInStr, tokenIn.decimals);
 
-    const buyDex  = dexRegistry.getDex(opportunity.buyDex);
+    const buyDex = dexRegistry.getDex(opportunity.buyDex);
     const sellDex = dexRegistry.getDex(opportunity.sellDex);
 
     console.log(`[Executor] Executing arbitrage via Circle Wallet: BUY ${tokenIn.symbol} on ${opportunity.buyDex}, SELL on ${opportunity.sellDex}`);
@@ -73,11 +73,11 @@ class Executor {
     // Query exact tokenOut (EURC) balance received
     const actualOut = await eurcContract.balanceOf(walletAddress);
     console.log(`[Executor] Exact ${tokenOut.symbol} balance for Leg 2: ${actualOut.toString()}`);
-    
+
     if (actualOut <= 0n) {
       throw new Error(`[Executor] Failed to receive any ${tokenOut.symbol} from Leg 1.`);
     }
-    
+
     // 1. Approve Leg 2 (Permit2 flow for UniversalRouter, or direct ERC-20 approve)
     await this._ensureApproval(sellDex, tokenOut.address, actualOut, walletAddress);
 
