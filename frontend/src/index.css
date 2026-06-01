@@ -195,9 +195,14 @@ td {
 .scanning-text {
   animation: scanPulse 2s ease-in-out infinite;
 }
-
 /* Pulsing dot for live data indicators */
 @keyframes pulse {
   0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent-green); }
   50%       { opacity: 0.4; box-shadow: 0 0 2px var(--accent-green); }
+}
+
+/* Typewriter cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }

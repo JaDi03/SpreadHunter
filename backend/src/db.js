@@ -5,11 +5,8 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 let supabase;
 
-if (supabaseUrl && supabaseKey) {
+if (supabaseUrl && supabaseKey && supabaseUrl !== 'TU_SUPABASE_URL_AQUI') {
   supabase = createClient(supabaseUrl, supabaseKey);
-  console.log('✅ Conectado a Supabase.');
-} else {
-  console.warn("⚠️ SUPABASE_URL o SUPABASE_KEY faltan en el .env! El historial no se guardará.");
 }
 
 async function insertPrice(pair, buyPrice, sellPrice) {

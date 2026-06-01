@@ -28,7 +28,12 @@ class AgentRegistry {
    * Records successful arbitrage feedback into the ERC-8004 Reputation Registry.
    * Uses Circle Developer-Controlled Wallets for signing and broadcasting.
    */
-  async recordSuccess(reasoningText) {
+  async recordSuccess(reasoningText, opp = {}) {
+    if (process.env.DEMO_MODE === 'true') {
+      console.log(`[AgentRegistry] DEMO MODE: Mocking reputation feedback...`);
+      return '0x' + Array(64).fill(0).map(()=>Math.floor(Math.random()*16).toString(16)).join('');
+    }
+
     const agentId = this._getAgentId();
     const walletAddress = config.settings.agent.validatorAddress;
 
@@ -42,12 +47,21 @@ class AgentRegistry {
     }
 
     try {
-      const tag = 'successful_arbitrage';
-      // Anchor the LLM reasoning on-chain as a keccak256 hash
+      const tag1 = 'successful_arbitrage';
+      const tag2 = opp.pair
+        ? `${opp.pair} | buy:${opp.buyDex} sell:${opp.sellDex} | net:${Number(opp.netSpreadPercent).toFixed(4)}%`
+        : '';
+      const endpoint = opp.buyDex && opp.sellDex ? `${opp.buyDex}->${opp.sellDex}` : '';
+      const explorerBase = config.network?.explorer || 'https://testnet.arcscan.app';
+      const feedbackURI = `${explorerBase}/token/${config.settings.agent.identityRegistry}/instance/${agentId}`;
+
       const feedbackHash = keccak256(toHex(reasoningText));
-      const score = 100; // Max score for a confirmed successful execution
+      const score = 100;
 
       console.log(`[AgentRegistry] Submitting reputation feedback for Agent ${agentId}…`);
+      console.log(`  tag2      : ${tag2}`);
+      console.log(`  endpoint  : ${endpoint}`);
+      console.log(`  feedbackURI: ${feedbackURI}`);
 
       const txHash = await walletManager.executeContractCall({
         walletAddress,
@@ -56,11 +70,11 @@ class AgentRegistry {
         abiParameters: [
           agentId.toString(),
           score.toString(),
-          "0",            // weight
-          tag,
-          "",           // reviewURI
-          "",           // credentialsURI
-          "",           // encryptedData
+          "0",
+          tag1,
+          tag2,
+          endpoint,
+          feedbackURI,
           feedbackHash
         ]
       });

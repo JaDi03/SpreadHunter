@@ -95,13 +95,17 @@ function App() {
           const explorerBase = data.explorerBase || 'https://testnet.arcscan.app';
           setStats((prev) => {
             const newTxs = prev.totalTxs + 1;
-            // Usamos un aproximado basado en defaultAmountIn * spread. Lo ideal sería que el backend envíe el profit exacto en USDC.
+            // Net profit in USDC: tradeSize * netSpreadPercent
             const estimatedProfit = (parseFloat(tradeAmount) * (data.netSpreadPercent / 100));
+            // Simulate balance: add net profit (fees are already deducted in netSpreadPercent)
+            const newUsdcBalance = (parseFloat(prev.usdcBalance) + estimatedProfit).toFixed(4);
             return {
               ...prev,
               totalTxs: newTxs,
               totalProfitUsdc: prev.totalProfitUsdc + estimatedProfit,
               successRate: Math.round((newTxs / (prev.opportunitiesFound || 1)) * 100),
+              lastRepTxHash: data.repTxHash || prev.lastRepTxHash,
+              usdcBalance: newUsdcBalance,
             };
           });
           setCurrentReasoning(prev =>
