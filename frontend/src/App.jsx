@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
 import StatsPanel from './components/StatsPanel';
 import Dashboard from './components/Dashboard';
 import ReasoningModal from './components/ReasoningModal';
-import BridgeButton from './components/BridgeButton';
 import WalletOnboarding from './components/WalletOnboarding';
 import AgentSetupWizard from './components/AgentSetupWizard';
 
@@ -28,6 +27,11 @@ function App() {
   });
   const [isAgentRegistered, setIsAgentRegistered] = useState(null);
   const [tradeAmount, setTradeAmount] = useState('1');
+
+  const tradeAmountRef = useRef(tradeAmount);
+  useEffect(() => {
+    tradeAmountRef.current = tradeAmount;
+  }, [tradeAmount]);
 
   useEffect(() => {
     // 0. Fetch config
@@ -96,7 +100,7 @@ function App() {
           setStats((prev) => {
             const newTxs = prev.totalTxs + 1;
             // Net profit in USDC: tradeSize * netSpreadPercent
-            const estimatedProfit = (parseFloat(tradeAmount) * (data.netSpreadPercent / 100));
+            const estimatedProfit = (parseFloat(tradeAmountRef.current) * (data.netSpreadPercent / 100));
             // Simulate balance: add net profit (fees are already deducted in netSpreadPercent)
             const newUsdcBalance = (parseFloat(prev.usdcBalance) + estimatedProfit).toFixed(4);
             return {
