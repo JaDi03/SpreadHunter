@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function WalletOnboarding({ onWalletCreated }) {
   const [isGenerating, setIsGenerating] = useState(false);

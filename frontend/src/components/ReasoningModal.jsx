@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;
 
@@ -26,7 +26,7 @@ export default function ReasoningModal({ text }) {
   // Typewriter effect — fires whenever `text` changes
   useEffect(() => {
     if (!text) {
-      setDisplayed('');
+      Promise.resolve().then(() => setDisplayed(''));
       fullTextRef.current = '';
       iRef.current = 0;
       if (timerRef.current) clearInterval(timerRef.current);
@@ -41,7 +41,7 @@ export default function ReasoningModal({ text }) {
 
     if (!isAppend) {
       // It's a completely new reasoning block (new opportunity)
-      setDisplayed('');
+      Promise.resolve().then(() => setDisplayed(''));
       iRef.current = 0;
     }
 

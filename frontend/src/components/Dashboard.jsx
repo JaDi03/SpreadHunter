@@ -1,4 +1,3 @@
-import React from 'react';
 import ExecuteButton from './ExecuteButton';
 import PriceChart from './PriceChart';
 

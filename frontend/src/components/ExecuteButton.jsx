@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 export default function ExecuteButton({ opportunity, onSuccess, userWallet }) {
@@ -17,6 +17,9 @@ export default function ExecuteButton({ opportunity, onSuccess, userWallet }) {
           recipientAddress: userWallet?.address
         }),
       });
+      if (!response.ok) {
+        throw new Error('Failed to build transaction execution calldata');
+      }
       
       // 2. Sign and send with embedded wallet (App Kit)
       // await wallet.sendTransaction(calldata);

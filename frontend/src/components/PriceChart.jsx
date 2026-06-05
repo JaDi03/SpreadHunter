@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -79,7 +79,7 @@ export default function PriceChart() {
   }, []);
 
   useEffect(() => {
-    fetchHistory();
+    Promise.resolve().then(() => fetchHistory());
     // Refresh every 30s
     const interval = setInterval(fetchHistory, 30000);
     return () => clearInterval(interval);

@@ -1,4 +1,3 @@
-import React from 'react';
 
 // Status dot colors
 const STATUS_COLOR = {

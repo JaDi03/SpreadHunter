@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // Circle CCTP Bridge Button
 // Uses the Circle Cross-Chain Transfer Protocol to bridge USDC from another chain
